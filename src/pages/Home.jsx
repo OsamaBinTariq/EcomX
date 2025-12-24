@@ -4,7 +4,6 @@ import axios from "axios";
 import {
   Grid,
   Card,
-  CardMedia,
   CardContent,
   Typography,
   Button,
@@ -16,8 +15,7 @@ import {
   Toolbar,
 } from "@mui/material";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
-
-
+import { Link } from "react-router-dom";
 
 const Home = () => {
   const [products, setProducts] = useState([]);
@@ -57,16 +55,16 @@ const Home = () => {
       maxWidth="xl"
       sx={{ py: 4, bgcolor: "#f9fafb", minHeight: "100vh" }}
     >
+      
       <Toolbar />
-
+      
       <Grid container spacing={4}>
         {products.map((product) => (
           <Grid
             item
             xs={12}
             sm={6}
-            md={4}
-            lg={3}
+            md={3} 
             key={product.id}
             sx={{ display: "flex" }}
           >
@@ -82,26 +80,32 @@ const Home = () => {
                 "&:hover": { boxShadow: 6 },
               }}
             >
+              
               <Box
+                component={Link} 
+                to={`/product/${product.id}`} 
                 sx={{
                   position: "relative",
                   p: 2,
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-                  height: 250,
+                  height: 250, 
+                  bgcolor: "white",
+                  textDecoration: "none", 
                 }}
               >
-                <CardMedia
-                  component="img"
-                  image={product.image}
+               
+                <img
+                  src={product.image}
                   alt={product.title}
-                  sx={{
-                    height: "100%",
-                    width: "100%",
-                    objectFit: "contain",
+                  style={{
+                    maxHeight: "100%", 
+                    maxWidth: "100%",  
+                    objectFit: "contain" 
                   }}
                 />
+                
                 <Chip
                   label={product.category}
                   size="small"
@@ -160,9 +164,15 @@ const Home = () => {
                 <Button
                   variant="contained"
                   fullWidth
-                  onClick={() => addToCart(product)} 
+                  onClick={() => addToCart(product)}
                   startIcon={<AddShoppingCartIcon />}
-
+                  sx={{ 
+                    bgcolor: '#1f2937', 
+                    '&:hover': { bgcolor: 'black' },
+                    textTransform: 'none',
+                    fontWeight: 'bold',
+                    py: 1
+                  }}
                 >
                   Add to Cart
                 </Button>
