@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useCart } from "../context/CartContext";
+import { useSearch } from "../context/SearchContext";
 import axios from "axios";
 import {
   Grid,
@@ -21,6 +22,7 @@ const Home = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
+  const { searchTerm, selectedCategory } = useSearch();
 
   useEffect(() => {
     axios
@@ -34,6 +36,12 @@ const Home = () => {
         setLoading(false);
       });
   }, []);
+
+  const filteredProducts = products.filter((product) => {
+    const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+    const matchesSearch = product.title.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   if (loading) {
     return (
@@ -55,16 +63,25 @@ const Home = () => {
       maxWidth="xl"
       sx={{ py: 4, bgcolor: "#f9fafb", minHeight: "100vh" }}
     >
-      
       <Toolbar />
       
+      <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 4, fontFamily: 'monospace', textTransform: 'uppercase' }}>
+        {selectedCategory === 'all' ? 'FRESH DROPS' : selectedCategory}
+      </Typography>
+
+      {filteredProducts.length === 0 && (
+        <Typography variant="h6" color="text.secondary">
+          No products found matching your search.
+        </Typography>
+      )}
+
       <Grid container spacing={4}>
-        {products.map((product) => (
+        {filteredProducts.map((product) => (
           <Grid
             item
             xs={12}
             sm={6}
-            md={3} 
+            md={3}
             key={product.id}
             sx={{ display: "flex" }}
           >
@@ -80,29 +97,27 @@ const Home = () => {
                 "&:hover": { boxShadow: 6 },
               }}
             >
-              
               <Box
-                component={Link} 
-                to={`/product/${product.id}`} 
+                component={Link}
+                to={`/product/${product.id}`}
                 sx={{
                   position: "relative",
                   p: 2,
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-                  height: 250, 
+                  height: 250,
                   bgcolor: "white",
-                  textDecoration: "none", 
+                  textDecoration: "none",
                 }}
               >
-               
                 <img
                   src={product.image}
                   alt={product.title}
                   style={{
-                    maxHeight: "100%", 
-                    maxWidth: "100%",  
-                    objectFit: "contain" 
+                    maxHeight: "100%",
+                    maxWidth: "100%",
+                    objectFit: "contain",
                   }}
                 />
                 

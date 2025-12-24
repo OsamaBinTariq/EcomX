@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useCart } from "../context/CartContext";
+import { useState, useEffect } from "react";
 import {
   AppBar,
   Toolbar,
@@ -17,6 +16,9 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
+  Select,
+  MenuItem,
+  FormControl,
 } from "@mui/material";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import SearchIcon from "@mui/icons-material/Search";
@@ -24,10 +26,21 @@ import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import MenuIcon from "@mui/icons-material/Menu";
 import HomeIcon from "@mui/icons-material/Home";
 import { Link } from "react-router-dom";
+import { useCart } from "../context/CartContext";
+import { useSearch } from "../context/SearchContext"; 
+import axios from "axios";
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { cart } = useCart();
+  const { setSearchTerm, selectedCategory, setSelectedCategory } = useSearch(); 
+  const [categories, setCategories] = useState([]); 
+
+  useEffect(() => {
+    axios.get('https://fakestoreapi.com/products/categories')
+      .then(res => setCategories(res.data))
+      .catch(err => console.log(err));
+  }, []);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -53,8 +66,33 @@ const Navbar = () => {
             placeholder="Search..."
             className="ml-2 flex-1"
             sx={{ fontSize: "0.9rem" }}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </Paper>
+
+        <FormControl fullWidth size="small" sx={{ mt: 2 }}>
+          <Select
+            value={selectedCategory}
+            onChange={(e) => {
+              setSelectedCategory(e.target.value);
+            }}
+            displayEmpty
+            sx={{ 
+              bgcolor: '#f3f4f6', 
+              borderRadius: 2,
+              textAlign: 'left',
+              textTransform: 'capitalize',
+              '& fieldset': { border: '1px solid #e5e7eb' },
+            }}
+          >
+            <MenuItem value="all">All Categories</MenuItem>
+            {categories.map((cat) => (
+              <MenuItem key={cat} value={cat} sx={{ textTransform: "capitalize" }}>
+                {cat}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </Box>
 
       <Divider />
@@ -103,7 +141,8 @@ const Navbar = () => {
       >
         <Container maxWidth="xl">
           <Toolbar disableGutters>
-            <Box sx={{ flex: 1, display: "flex", alignItems: "center" }}>
+            
+            <Box sx={{ display: "flex", alignItems: "center", mr: 2 }}>
               <IconButton
                 sx={{ display: { xs: "flex", lg: "none" }, mr: 1 }}
                 onClick={handleDrawerToggle}
@@ -127,32 +166,79 @@ const Navbar = () => {
                 EcomX
               </Typography>
             </Box>
-            <Paper
-              component="form"
-              elevation={0}
+
+            
+            <Box
               sx={{
                 display: { xs: "none", lg: "flex" },
-                width: "500px",
                 alignItems: "center",
-                px: 2,
-                py: 0.5,
-                borderRadius: "999px",
-                bgcolor: "#f3f4f6",
-                border: "1px solid transparent",
-                "&:focus-within": { borderColor: "#d1d5db", bgcolor: "white" },
-                transition: "all 0.3s",
+                flex: 1,
+                maxWidth: "700px",
+                mx: "auto",
               }}
             >
-              <SearchIcon className="text-gray-500 mr-2" />
-              <InputBase placeholder="Search products..." sx={{ flex: 1 }} />
-            </Paper>
+              
+              <FormControl 
+                size="small" 
+                sx={{ 
+                  minWidth: 140, 
+                  bgcolor: "#f3f4f6", 
+                  borderRadius: "999px 0 0 999px", 
+                  borderRight: "1px solid #e5e7eb"
+                }}
+              >
+                <Select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  displayEmpty
+                  sx={{
+                    height: "40px",
+                    "& fieldset": { border: "none" }, 
+                    fontSize: "0.9rem",
+                    textTransform: "capitalize",
+                    pl: 1
+                  }}
+                >
+                  <MenuItem value="all">All Categories</MenuItem>
+                  {categories.map((cat) => (
+                    <MenuItem key={cat} value={cat} sx={{ textTransform: "capitalize" }}>
+                      {cat}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <Paper
+                component="form"
+                elevation={0}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  flex: 1,
+                  height: "40px",
+                  px: 2,
+                  bgcolor: "#f3f4f6",
+                  borderRadius: "0 999px 999px 0", 
+                  border: "1px solid transparent",
+                  "&:focus-within": { borderColor: "#d1d5db", bgcolor: "white" },
+                  transition: "all 0.3s",
+                }}
+              >
+                <InputBase 
+                  placeholder="Search products..." 
+                  sx={{ flex: 1 }} 
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <SearchIcon className="text-gray-500" />
+              </Paper>
+            </Box>
 
             <Box
               sx={{
-                flex: 1,
                 display: "flex",
-                justifyContent: "flex-end",
+                alignItems: "center",
                 gap: 1,
+                ml: "auto" 
               }}
             >
               <IconButton sx={{ display: { xs: "none", lg: "flex" } }}>

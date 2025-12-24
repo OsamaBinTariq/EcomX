@@ -6,13 +6,12 @@ import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import { useCart } from '../context/CartContext';
 
 const ProductDetails = () => {
-  const { id } = useParams(); // Get the ID from the URL
+  const { id } = useParams(); 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
 
   useEffect(() => {
-    // Fetch single product data
     axios.get(`https://fakestoreapi.com/products/${id}`)
       .then((res) => {
         setProduct(res.data);
