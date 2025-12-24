@@ -7,8 +7,6 @@ function App() {
   return (
     <>
       <Navbar />
-      
-      {/* This section tells React: "If the URL is '/', show the Home component" */}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/cart" element={<Cart />} />
