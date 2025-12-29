@@ -1,10 +1,13 @@
-import { Container, Typography, Toolbar, Grid, Card, CardContent, Button, Box, IconButton, Divider } from '@mui/material';
+import { Container, Typography, Toolbar, Grid, Card, Button, Box, IconButton, Divider } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useCart } from '../context/CartContext';
+import { useToast } from '../context/ToastContext'; 
 import { Link } from 'react-router-dom';
 
 const Cart = () => {
   const { cart, removeFromCart } = useCart();
+  const { showToast } = useToast(); 
+
   const totalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
 
   return (
@@ -51,7 +54,13 @@ const Cart = () => {
                   </Typography>
                 </Box>
 
-                <IconButton color="error" onClick={() => removeFromCart(item.id)}>
+                <IconButton 
+                  color="error" 
+                  onClick={() => {
+                    removeFromCart(item.id);
+                    showToast("Item removed from cart", "warning"); 
+                  }}
+                >
                   <DeleteIcon />
                 </IconButton>
               </Card>

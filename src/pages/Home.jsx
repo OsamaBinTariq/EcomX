@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useCart } from "../context/CartContext";
 import { useSearch } from "../context/SearchContext";
+import { useToast } from "../context/ToastContext";
 import axios from "axios";
 import {
   Grid,
@@ -23,6 +24,7 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
   const { searchTerm, selectedCategory } = useSearch();
+  const { showToast } = useToast();
 
   useEffect(() => {
     axios
@@ -38,8 +40,11 @@ const Home = () => {
   }, []);
 
   const filteredProducts = products.filter((product) => {
-    const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
-    const matchesSearch = product.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory =
+      selectedCategory === "all" || product.category === selectedCategory;
+    const matchesSearch = product.title
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
@@ -64,9 +69,17 @@ const Home = () => {
       sx={{ py: 4, bgcolor: "#f9fafb", minHeight: "100vh" }}
     >
       <Toolbar />
-      
-      <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 4, fontFamily: 'monospace', textTransform: 'uppercase' }}>
-        {selectedCategory === 'all' ? 'FRESH DROPS' : selectedCategory}
+
+      <Typography
+        variant="h4"
+        sx={{
+          fontWeight: "bold",
+          mb: 4,
+          fontFamily: "monospace",
+          textTransform: "uppercase",
+        }}
+      >
+        {selectedCategory === "all" ? "FRESH DROPS" : selectedCategory}
       </Typography>
 
       {filteredProducts.length === 0 && (
@@ -120,7 +133,7 @@ const Home = () => {
                     objectFit: "contain",
                   }}
                 />
-                
+
                 <Chip
                   label={product.category}
                   size="small"
@@ -179,14 +192,17 @@ const Home = () => {
                 <Button
                   variant="contained"
                   fullWidth
-                  onClick={() => addToCart(product)}
+                  onClick={() => {
+                    addToCart(product);
+                    showToast("Added to Cart!");
+                  }}
                   startIcon={<AddShoppingCartIcon />}
-                  sx={{ 
-                    bgcolor: '#1f2937', 
-                    '&:hover': { bgcolor: 'black' },
-                    textTransform: 'none',
-                    fontWeight: 'bold',
-                    py: 1
+                  sx={{
+                    bgcolor: "#1f2937",
+                    "&:hover": { bgcolor: "black" },
+                    textTransform: "none",
+                    fontWeight: "bold",
+                    py: 1,
                   }}
                 >
                   Add to Cart
