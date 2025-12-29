@@ -10,14 +10,17 @@ import {
   Box,
   IconButton,
   Divider,
+  ButtonGroup, 
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";     
+import RemoveIcon from "@mui/icons-material/Remove"; 
 import { useCart } from "../context/CartContext";
 import { useToast } from "../context/ToastContext";
 import { Link } from "react-router-dom";
 
 const Cart = () => {
-  const { cart, removeFromCart } = useCart();
+  const { cart, removeFromCart, increaseQuantity, decreaseQuantity } = useCart();
   const { showToast } = useToast();
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   
@@ -78,12 +81,27 @@ const Cart = () => {
                   <Typography variant="subtitle1" fontWeight="bold">
                     {item.title}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    ${item.price} x {item.quantity}
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    ${item.price} each
                   </Typography>
-                  <Typography variant="h6" color="primary" fontWeight="bold">
-                    ${(item.price * item.quantity).toFixed(2)}
-                  </Typography>
+
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <ButtonGroup size="small" variant="outlined" aria-label="quantity controls">
+                      <Button onClick={() => decreaseQuantity(item.id)}>
+                        <RemoveIcon fontSize="small" />
+                      </Button>
+                      <Button disabled sx={{ color: 'black !important', fontWeight: 'bold' }}>
+                        {item.quantity}
+                      </Button>
+                      <Button onClick={() => increaseQuantity(item.id)}>
+                        <AddIcon fontSize="small" />
+                      </Button>
+                    </ButtonGroup>
+                    
+                    <Typography variant="h6" color="primary" fontWeight="bold">
+                      ${(item.price * item.quantity).toFixed(2)}
+                    </Typography>
+                  </Box>
                 </Box>
 
                 <IconButton
