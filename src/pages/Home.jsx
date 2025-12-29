@@ -32,16 +32,22 @@ const Home = () => {
   const { showToast } = useToast();
 
   useEffect(() => {
-    setTimeout(() => {
-        axios
-        .get("https://fakestoreapi.com/products")
-        .then((res) => {
-            setProducts(res.data);
-            setLoading(false);
-        })
-        .catch(() => setLoading(false));
-    }, 1000);
+    axios
+      .get("https://fakestoreapi.com/products")
+      .then((res) => {
+        setProducts(res.data);
+        if (selectedCategory === 'all') setLoading(false); 
+      })
+      .catch(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000); 
+    return () => clearTimeout(timer);
+  }, [selectedCategory]); 
 
   const filteredProducts = products.filter((product) => {
     const matchesCategory =
@@ -79,11 +85,13 @@ const Home = () => {
           gap: 4,
         }}
       >
+        
         {loading
           ? Array.from(new Array(8)).map((_, index) => (
               <ProductSkeleton key={index} />
             ))
-          : filteredProducts.map((product) => (
+          : 
+            filteredProducts.map((product) => (
               <Card
                 key={product.id}
                 sx={{
@@ -171,10 +179,7 @@ const Home = () => {
                   </Box>
 
                   <Box sx={{ mt: "auto" }}>
-                    <Typography
-                      variant="h6"
-                      sx={{ fontWeight: "bold", mb: 2 }}
-                    >
+                    <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
                       ${product.price}
                     </Typography>
 
