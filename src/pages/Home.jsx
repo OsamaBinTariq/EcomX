@@ -10,7 +10,6 @@ import {
   Chip,
   Rating,
   Box,
-  CircularProgress,
   Toolbar,
 } from "@mui/material";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
@@ -18,6 +17,7 @@ import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import { useCart } from "../context/CartContext";
 import { useSearch } from "../context/SearchContext";
 import { useToast } from "../context/ToastContext";
+import ProductSkeleton from "../components/ProductSkeleton";
 
 const IMAGE_HEIGHT = 240;
 const TITLE_LINES = 2;
@@ -32,13 +32,15 @@ const Home = () => {
   const { showToast } = useToast();
 
   useEffect(() => {
-    axios
-      .get("https://fakestoreapi.com/products")
-      .then((res) => {
-        setProducts(res.data);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+    setTimeout(() => {
+        axios
+        .get("https://fakestoreapi.com/products")
+        .then((res) => {
+            setProducts(res.data);
+            setLoading(false);
+        })
+        .catch(() => setLoading(false));
+    }, 1000);
   }, []);
 
   const filteredProducts = products.filter((product) => {
@@ -49,14 +51,6 @@ const Home = () => {
       .includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
   });
-
-  if (loading) {
-    return (
-      <Box sx={{ minHeight: "100vh", display: "grid", placeItems: "center" }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
 
   return (
     <Container maxWidth="xl" sx={{ py: 4, bgcolor: "#f9fafb" }}>
@@ -85,127 +79,127 @@ const Home = () => {
           gap: 4,
         }}
       >
-        {filteredProducts.map((product) => (
-          <Card
-            key={product.id}
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              height: "100%", 
-              borderRadius: 3,
-              border: "1px solid #e5e7eb",
-              transition: "0.3s",
-              "&:hover": { boxShadow: 6 },
-            }}
-          >
-           
-            <Box
-              component={Link}
-              to={`/product/${product.id}`}
-              sx={{
-                height: IMAGE_HEIGHT,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                p: 2,
-                bgcolor: "white",
-                position: "relative",
-                textDecoration: "none",
-              }}
-            >
-              <Box
-                component="img"
-                src={product.image}
-                alt={product.title}
+        {loading
+          ? Array.from(new Array(8)).map((_, index) => (
+              <ProductSkeleton key={index} />
+            ))
+          : filteredProducts.map((product) => (
+              <Card
+                key={product.id}
                 sx={{
-                  maxHeight: "100%",
-                  maxWidth: "100%",
-                  objectFit: "contain",
-                }}
-              />
-
-              <Chip
-                label={product.category}
-                size="small"
-                sx={{
-                  position: "absolute",
-                  top: 10,
-                  right: 10,
-                  textTransform: "capitalize",
-                  bgcolor: "rgba(243,244,246,0.9)",
-                }}
-              />
-            </Box>
-
-            
-            <CardContent
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                flexGrow: 1,
-              }}
-            >
-              
-              <Typography
-                variant="subtitle1"
-                title={product.title}
-                sx={{
-                  fontWeight: "bold",
-                  lineHeight: LINE_HEIGHT,
-                  height: `${TITLE_LINES * LINE_HEIGHT}em`,
-                  display: "-webkit-box",
-                  WebkitLineClamp: TITLE_LINES,
-                  WebkitBoxOrient: "vertical",
-                  overflow: "hidden",
-                  mb: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  height: "100%",
+                  borderRadius: 3,
+                  border: "1px solid #e5e7eb",
+                  transition: "0.3s",
+                  "&:hover": { boxShadow: 6 },
                 }}
               >
-                {product.title}
-              </Typography>
-
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <Rating
-                  value={product.rating.rate}
-                  precision={0.5}
-                  size="small"
-                  readOnly
-                />
-                <Typography variant="caption" color="text.secondary">
-                  ({product.rating.count})
-                </Typography>
-              </Box>
-
-              
-              <Box sx={{ mt: "auto" }}>
-                <Typography
-                  variant="h6"
-                  sx={{ fontWeight: "bold", mb: 2 }}
-                >
-                  ${product.price}
-                </Typography>
-
-                <Button
-                  fullWidth
-                  variant="contained"
-                  startIcon={<AddShoppingCartIcon />}
-                  onClick={() => {
-                    addToCart(product);
-                    showToast("Added to Cart!");
-                  }}
+                <Box
+                  component={Link}
+                  to={`/product/${product.id}`}
                   sx={{
-                    bgcolor: "#1f2937",
-                    "&:hover": { bgcolor: "black" },
-                    textTransform: "none",
-                    fontWeight: "bold",
-                    py: 1,
+                    height: IMAGE_HEIGHT,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    p: 2,
+                    bgcolor: "white",
+                    position: "relative",
+                    textDecoration: "none",
                   }}
                 >
-                  Add to Cart
-                </Button>
-              </Box>
-            </CardContent>
-          </Card>
-        ))}
+                  <Box
+                    component="img"
+                    src={product.image}
+                    alt={product.title}
+                    sx={{
+                      maxHeight: "100%",
+                      maxWidth: "100%",
+                      objectFit: "contain",
+                    }}
+                  />
+
+                  <Chip
+                    label={product.category}
+                    size="small"
+                    sx={{
+                      position: "absolute",
+                      top: 10,
+                      right: 10,
+                      textTransform: "capitalize",
+                      bgcolor: "rgba(243,244,246,0.9)",
+                    }}
+                  />
+                </Box>
+
+                <CardContent
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    flexGrow: 1,
+                  }}
+                >
+                  <Typography
+                    variant="subtitle1"
+                    title={product.title}
+                    sx={{
+                      fontWeight: "bold",
+                      lineHeight: LINE_HEIGHT,
+                      height: `${TITLE_LINES * LINE_HEIGHT}em`,
+                      display: "-webkit-box",
+                      WebkitLineClamp: TITLE_LINES,
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                      mb: 1,
+                    }}
+                  >
+                    {product.title}
+                  </Typography>
+
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <Rating
+                      value={product.rating.rate}
+                      precision={0.5}
+                      size="small"
+                      readOnly
+                    />
+                    <Typography variant="caption" color="text.secondary">
+                      ({product.rating.count})
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ mt: "auto" }}>
+                    <Typography
+                      variant="h6"
+                      sx={{ fontWeight: "bold", mb: 2 }}
+                    >
+                      ${product.price}
+                    </Typography>
+
+                    <Button
+                      fullWidth
+                      variant="contained"
+                      startIcon={<AddShoppingCartIcon />}
+                      onClick={() => {
+                        addToCart(product);
+                        showToast("Added to Cart!");
+                      }}
+                      sx={{
+                        bgcolor: "#1f2937",
+                        "&:hover": { bgcolor: "black" },
+                        textTransform: "none",
+                        fontWeight: "bold",
+                        py: 1,
+                      }}
+                    >
+                      Add to Cart
+                    </Button>
+                  </Box>
+                </CardContent>
+              </Card>
+            ))}
       </Box>
     </Container>
   );
