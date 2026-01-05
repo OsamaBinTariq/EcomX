@@ -15,17 +15,22 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import { useCart } from "../context/CartContext";
+import { useSelector, useDispatch } from "react-redux";
+import { 
+  removeFromCart, 
+  increaseQuantity, 
+  decreaseQuantity 
+} from "../redux/cartSlice";
+
 import { useToast } from "../context/ToastContext";
 import { Link } from "react-router-dom";
 
 const Cart = () => {
-  const { cart, removeFromCart, increaseQuantity, decreaseQuantity } =
-    useCart();
+  const cartItems = useSelector((state) => state.cart.items);
+  const dispatch = useDispatch();
   const { showToast } = useToast();
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-
-  const totalPrice = cart.reduce(
+  const totalPrice = cartItems.reduce(
     (total, item) => total + item.price * item.quantity,
     0
   );
@@ -44,7 +49,7 @@ const Cart = () => {
         YOUR SHOPPING CART
       </Typography>
 
-      {cart.length === 0 ? (
+      {cartItems.length === 0 ? (
         <Box sx={{ textAlign: "center", mt: 10 }}>
           <Typography variant="h6" color="text.secondary" sx={{ mb: 2 }}>
             Your cart is currently empty.
@@ -61,7 +66,7 @@ const Cart = () => {
       ) : (
         <Grid container spacing={4}>
           <Grid item xs={12} md={8}>
-            {cart.map((item) => (
+            {cartItems.map((item) => (
               <Card
                 key={item.id}
                 sx={{ mb: 2, display: "flex", alignItems: "center", p: 2 }}
@@ -99,10 +104,10 @@ const Cart = () => {
                       <Button
                         onClick={() => {
                           if (item.quantity === 1) {
-                            removeFromCart(item.id);
+                            dispatch(removeFromCart(item.id)); 
                             showToast("Item removed from cart", "warning");
                           } else {
-                            decreaseQuantity(item.id);
+                            dispatch(decreaseQuantity(item.id)); 
                           }
                         }}
                       >
@@ -116,7 +121,7 @@ const Cart = () => {
                         {item.quantity}
                       </Button>
 
-                      <Button onClick={() => increaseQuantity(item.id)}>
+                      <Button onClick={() => dispatch(increaseQuantity(item.id))}>
                         <AddIcon fontSize="small" />
                       </Button>
                     </ButtonGroup>
@@ -126,11 +131,10 @@ const Cart = () => {
                     </Typography>
                   </Box>
                 </Box>
-
                 <IconButton
                   color="error"
                   onClick={() => {
-                    removeFromCart(item.id);
+                    dispatch(removeFromCart(item.id));
                     showToast("Item removed from cart", "warning");
                   }}
                 >

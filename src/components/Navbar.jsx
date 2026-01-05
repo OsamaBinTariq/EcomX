@@ -26,13 +26,13 @@ import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import MenuIcon from "@mui/icons-material/Menu";
 import HomeIcon from "@mui/icons-material/Home";
 import { Link } from "react-router-dom";
-import { useCart } from "../context/CartContext";
+import { useSelector } from "react-redux"; 
 import { useSearch } from "../context/SearchContext"; 
 import axios from "axios";
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { cart } = useCart();
+  const cartItems = useSelector((state) => state.cart.items);
   const { setSearchTerm, selectedCategory, setSelectedCategory } = useSearch(); 
   const [categories, setCategories] = useState([]); 
 
@@ -60,12 +60,13 @@ const Navbar = () => {
           component="form"
           elevation={0}
           className="flex items-center px-3 py-1 rounded-full bg-gray-100 border border-gray-200"
+          sx={{ display: 'flex', alignItems: 'center', px: 2, py: 0.5, bgcolor: '#f3f4f6', borderRadius: 5, border: '1px solid #e5e7eb' }}
         >
-          <SearchIcon className="text-gray-400" />
+          <SearchIcon sx={{ color: '#9ca3af' }} />
           <InputBase
             placeholder="Search..."
             className="ml-2 flex-1"
-            sx={{ fontSize: "0.9rem" }}
+            sx={{ ml: 1, flex: 1, fontSize: "0.9rem" }}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </Paper>
@@ -229,7 +230,7 @@ const Navbar = () => {
                   sx={{ flex: 1 }} 
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                <SearchIcon className="text-gray-500" />
+                <SearchIcon sx={{ color: '#9ca3af' }} />
               </Paper>
             </Box>
 
@@ -246,7 +247,7 @@ const Navbar = () => {
               </IconButton>
 
               <IconButton component={Link} to="/cart">
-                <Badge badgeContent={cart.length} color="error">
+                <Badge badgeContent={cartItems.length} color="error">
                   <ShoppingCartIcon />
                 </Badge>
               </IconButton>

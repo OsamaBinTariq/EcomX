@@ -1,69 +1,52 @@
-import { useState } from 'react';
-import { 
-  Dialog, DialogTitle, DialogContent, DialogActions, 
-  TextField, Button, Typography, Box 
-} from '@mui/material';
-import { useCart } from '../context/CartContext';
-import { useToast } from '../context/ToastContext';
+import { useState } from "react";
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Box, Typography } from "@mui/material";
+import { useSelector, useDispatch } from "react-redux";
+import { clearCart } from "../redux/cartSlice"; 
+
+import { useToast } from "../context/ToastContext";
 
 const CheckoutModal = ({ open, onClose }) => {
-  const { clearCart } = useCart();
-  const { showToast } = useToast();
+  const cartItems = useSelector((state) => state.cart.items);
+  const dispatch = useDispatch();
   
-  const [formData, setFormData] = useState({ name: '', email: '', address: '' });
+  const { showToast } = useToast();
+  const [formData, setFormData] = useState({ name: "", email: "", address: "" });
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const totalPrice = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    dispatch(clearCart());
     
-    setTimeout(() => {
-      clearCart(); 
-      showToast('Order placed successfully! Check your email.', 'success'); 
-      onClose(); 
-    }, 1500);
+    showToast("Order Placed Successfully!");
+    onClose();
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle sx={{ fontWeight: 'bold', fontFamily: 'monospace' }}>
-        COMPLETE YOUR ORDER
-      </DialogTitle>
-      
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+      <DialogTitle>Checkout</DialogTitle>
       <form onSubmit={handleSubmit}>
         <DialogContent>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Enter your details to proceed with the payment simulation.
-          </Typography>
-          
-          <TextField 
-            autoFocus margin="dense" name="name" label="Full Name" 
-            type="text" fullWidth required variant="outlined" 
-            onChange={handleChange} sx={{ mb: 2 }}
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="subtitle1" fontWeight="bold">Total Amount: ${totalPrice.toFixed(2)}</Typography>
+            <Typography variant="body2" color="text.secondary">Items: {cartItems.length}</Typography>
+          </Box>
+          <TextField
+            autoFocus margin="dense" label="Name" fullWidth required
+            value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           />
-          <TextField 
-            margin="dense" name="email" label="Email Address" 
-            type="email" fullWidth required variant="outlined" 
-            onChange={handleChange} sx={{ mb: 2 }}
+          <TextField
+            margin="dense" label="Email" type="email" fullWidth required
+            value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           />
-          <TextField 
-            margin="dense" name="address" label="Shipping Address" 
-            type="text" fullWidth required variant="outlined" 
-            multiline rows={3} onChange={handleChange} 
+          <TextField
+            margin="dense" label="Address" fullWidth required multiline rows={3}
+            value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })}
           />
         </DialogContent>
-
-        <DialogActions sx={{ p: 3 }}>
-          <Button onClick={onClose} color="inherit">Cancel</Button>
-          <Button 
-            type="submit" 
-            variant="contained" 
-            sx={{ bgcolor: '#1f2937', '&:hover': { bgcolor: 'black' } }}
-          >
-            Pay Now
-          </Button>
+        <DialogActions>
+          <Button onClick={onClose}>Cancel</Button>
+          <Button type="submit" variant="contained" color="primary">Place Order</Button>
         </DialogActions>
       </form>
     </Dialog>

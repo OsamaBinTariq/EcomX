@@ -1,15 +1,20 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { Container, Grid, Typography, Button, Box, Rating, CircularProgress, Chip, Toolbar, Divider } from '@mui/material';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
-import { useCart } from '../context/CartContext';
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useDispatch } from 'react-redux';
+import { addToCart } from '../redux/cartSlice';
+import { useToast } from '../context/ToastContext';
 
 const ProductDetails = () => {
   const { id } = useParams(); 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { addToCart } = useCart();
+  const dispatch = useDispatch();
+  
+  const { showToast } = useToast();
 
   useEffect(() => {
     axios.get(`https://fakestoreapi.com/products/${id}`)
@@ -36,7 +41,10 @@ const ProductDetails = () => {
   return (
     <Container maxWidth="lg" sx={{ py: 4, bgcolor: '#fff', minHeight: '100vh' }}>
       <Toolbar /> 
-      
+      <Button component={Link} to="/" startIcon={<ArrowBackIcon />} sx={{ mb: 2 }}>
+        Back
+      </Button>
+
       <Grid container spacing={6}>
         
         <Grid item xs={12} md={6}>
@@ -86,7 +94,10 @@ const ProductDetails = () => {
             <Button 
               variant="contained" 
               size="large"
-              onClick={() => addToCart(product)}
+              onClick={() => {
+                dispatch(addToCart(product));
+                showToast("Added to Cart!");
+              }}
               startIcon={<AddShoppingCartIcon />}
               sx={{ 
                 bgcolor: '#1f2937', 

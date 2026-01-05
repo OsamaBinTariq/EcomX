@@ -13,8 +13,8 @@ import {
   Toolbar,
 } from "@mui/material";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
-
-import { useCart } from "../context/CartContext";
+import { useDispatch } from "react-redux";
+import { addToCart } from "../redux/cartSlice";
 import { useSearch } from "../context/SearchContext";
 import { useToast } from "../context/ToastContext";
 import ProductSkeleton from "../components/ProductSkeleton";
@@ -26,8 +26,7 @@ const LINE_HEIGHT = 1.4;
 const Home = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const { addToCart } = useCart();
+  const dispatch = useDispatch();
   const { searchTerm, selectedCategory } = useSearch();
   const { showToast } = useToast();
 
@@ -188,7 +187,7 @@ const Home = () => {
                       variant="contained"
                       startIcon={<AddShoppingCartIcon />}
                       onClick={() => {
-                        addToCart(product);
+                        dispatch(addToCart(product)); 
                         showToast("Added to Cart!");
                       }}
                       sx={{
